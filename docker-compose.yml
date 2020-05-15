@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  server:
+    build:
+      context: ./
+      dockerfile: docker/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    ports:
+      - "9090:9090"
+    env_file:
+      - .env
+
+
+  postgres:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}

@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  unit:
+    image: golang:1.14
+    volumes:
+      - .:/usr/src/app
+    working_dir: /usr/src/app
+    env_file:
+      - .env
+    command: >
+      bash -c "pwd && go mod download
+      && go test -timeout 10m --cover -v ./..."
+
+  integration:
+    image: golang:1.14
+    depends_on:
+      - postgres
+    volumes:
+      - .:/usr/src/app
+    working_dir: /usr/src/app
+    env_file:
+      - .env
+    command: >
+      bash -c "pwd && go mod download
+      && go test -tags "integration" -timeout 10m --cover -v ./..."
+
+  build:
+    image: golang:1.14
+    volumes:
+      - .:/usr/src/app
+    working_dir: /usr/src/app
+    env_file:
+      - .env
+    command: bash -c "CGO_ENABLED=0 go build -o ./bin/server -a -i ./cmd/server/main.go"
+
+  local-migrations:
+    image: golang:1.14
+    depends_on:
+      - postgres
+    volumes:
+      - ./migrations:/usr/src/migrations:ro
+    working_dir: /usr/src
+    env_file:
+      - .env
+    command: >
+        bash -c "go get -tags 'postgres' -u github.com/golang-migrate/migrate/cmd/migrate && \
+          echo 'downloaded' && go install -tags 'postgres' github.com/golang-migrate/migrate/cmd/migrate && \
+          migrate -source file:///usr/src/migrations -database postgres://$${DB_USER}:$${DB_PASSWORD}@$${DB_HOST}/$${DB_NAME}?sslmode=disable up"
