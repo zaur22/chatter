@@ -8,7 +8,7 @@
 *.out
 
 
-# IDE files
+# Jetbrains files
 misc.xml
 vcs.xml
 modules.xml
@@ -17,3 +17,4 @@ analytics.iml
 
 # builded bin files
 /bin/
+

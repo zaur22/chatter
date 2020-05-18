@@ -24,4 +24,5 @@ test-build:
 # Требуется установленный protoc и модуль для генерации go кода.
 # Подробнее https://grpc.io/docs/quickstart/go/
 gen-grpc:
-	 protoc -I ./api ./api/grpc/chatter.proto --go_out=plugins=grpc:pkg/rpc
+	protoc -I ./api ./api/grpc/chatter.user.proto --go_out=plugins=grpc:pkg/rpc/
+	protoc -I ./api ./api/grpc/chatter.chat.proto --go_out=plugins=grpc:pkg/rpc/
