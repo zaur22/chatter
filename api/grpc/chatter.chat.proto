@@ -2,20 +2,18 @@ syntax = "proto3";
 
 package chatter.chat;
 
-import "chatter.user.proto";
-
 option go_package = "/api";
 
 service ChatService{
-  rpc GetChatList(GetChatListRequest) returns (GetChatListResponse)
-  rpc GetChatsUpdates(GetChatsUpdatesRequest) returns (stream GetChatsUpdatesResponse)
-  rpc GetPreviousMessages(GetPreviousMessagesRequest) returns (GetPreviousMessagesResponse)
-  rpc GetGroupMembers(GetGroupMembersRequest) returns (GetGroupMembersResponse)
-  rpc SendMessage(SendMessageRequest) returns (SendMessageResponse)
-  rpc CreateGroupChat(CreateGroupChatRequest) returns (CreateGroupChatResponse)
-  rpc InviteUsers(InviteUsersRequest) returns (InviteUsersResponse)
-  rpc EnterGroupChat(EnterGroupChatRequest) returns (EnterGroupChatResponse)
-  rpc LeftFromGroupChat(LeftFromGroupChatRequest) returns (LeftFromGroupChatResponse)
+  rpc GetChatList(GetChatListRequest) returns (GetChatListResponse);
+  rpc GetChatsUpdates(GetChatsUpdatesRequest) returns (stream GetChatsUpdatesResponse);
+  rpc GetPreviousMessages(GetPreviousMessagesRequest) returns (GetPreviousMessagesResponse);
+  rpc GetGroupMembers(GetGroupMembersRequest) returns (GetGroupMembersResponse);
+  rpc SendMessage(SendMessageRequest) returns (SendMessageResponse);
+  rpc CreateGroupChat(CreateGroupChatRequest) returns (CreateGroupChatResponse);
+  rpc InviteUsers(InviteUsersRequest) returns (InviteUsersResponse);
+  rpc EnterGroupChat(EnterGroupChatRequest) returns (EnterGroupChatResponse);
+  rpc LeftFromGroupChat(LeftFromGroupChatRequest) returns (LeftFromGroupChatResponse);
 }
 
 message Chat{
@@ -62,7 +60,7 @@ message GetChatsUpdatesResponse{
 
   message UpdatedChatStatus {
     string chat_uuid = 1;
-    oneof status_oneof{
+    oneof status_oneof {
       Chat.DirectFields direct_ext = 2;
       Chat.GroupFields group_ext = 3;
     }
