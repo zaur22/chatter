@@ -1,0 +1,107 @@
+syntax = "proto3";
+
+package chatter.user;
+
+option go_package = "/api";
+
+service UserService{
+  rpc RegisterUser (RegisterUserRequest) returns (RegisterUserResponse);
+  rpc SignIn (SignInRequest) returns (SignInResponse);
+  rpc GetUserData (GetUserDataRequest) returns (GetUserDataResponse);
+  rpc UpdateProfile (UpdateProfileRequest) returns (UpdateProfileResponse);
+  rpc ResetPassword (ResetPasswordRequest) returns (ResetPasswordResponse);
+  rpc RefreshJWT (RefreshJWTRequest) returns (RefreshJWTResponse);
+  rpc GetActiveSessions (GetActiveSessionsRequest) returns (GetActiveSessionsResponse);
+  rpc DiactivateSession (DiactivateSessionRequest) returns (DiactivateSessionResponse);
+}
+
+message RegisterUserRequest {
+  string link = 1;
+  string password = 2;
+  string name = 3;
+}
+
+message RegisterUserResponse{
+  message FieldsErrors{
+    string link = 1;
+    string password = 2;
+    string name = 3;
+  }
+  FieldsErrors fields_errors = 1;
+}
+
+message SignInRequest{
+  string link = 1;
+  string password = 2;
+}
+
+message SignInResponse{
+  string JWT_token = 1;
+  string refresh_token = 2;
+  User user = 3;
+}
+
+message UpdateProfileRequest{
+  string link = 1;
+  string name = 2;
+}
+
+message UpdateProfileResponse{
+  message FieldsErrors{
+    string link = 1;
+    string name = 2;
+  }
+  oneof result_oneof {
+    FieldsErrors fields_errors = 1;
+    User user = 2;
+  }
+}
+
+message ResetPasswordRequest{
+  string old_password = 1;
+  string new_password = 2;
+}
+
+message ResetPasswordResponse{}
+
+message RefreshJWTRequest{
+  string jwt_token = 1;
+  string refresh_token = 2;
+}
+
+message RefreshJWTResponse{
+  string jwt_token = 1;
+  string refresh_token = 2;
+}
+
+message GetActiveSessionsRequest{
+}
+
+message GetActiveSessionsResponse{
+  message Session{
+    string uuid = 1;
+    string device_name = 2;
+    uint32 updated_at = 3;
+    uint32 created_at = 4;
+  }
+}
+
+message DiactivateSessionRequest{
+  string uuid = 1;
+}
+
+message DiactivateSessionResponse{}
+
+message GetUserDataRequest{
+  repeated string users_uuids = 1;
+}
+
+message GetUserDataResponse{
+  repeated User users = 1;
+}
+
+message User{
+  string uuid = 1;
+  string link = 2;
+  string name = 3;
+}

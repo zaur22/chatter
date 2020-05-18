@@ -1,0 +1,184 @@
+syntax = "proto3";
+
+package chatter.chat;
+
+import "chatter.user.proto";
+
+option go_package = "/api";
+
+service ChatService{
+  rpc GetChatList(GetChatListRequest) returns (GetChatListResponse)
+  rpc GetChatsUpdates(GetChatsUpdatesRequest) returns (stream GetChatsUpdatesResponse)
+  rpc GetPreviousMessages(GetPreviousMessagesRequest) returns (GetPreviousMessagesResponse)
+  rpc GetGroupMembers(GetGroupMembersRequest) returns (GetGroupMembersResponse)
+  rpc SendMessage(SendMessageRequest) returns (SendMessageResponse)
+  rpc CreateGroupChat(CreateGroupChatRequest) returns (CreateGroupChatResponse)
+  rpc InviteUsers(InviteUsersRequest) returns (InviteUsersResponse)
+  rpc EnterGroupChat(EnterGroupChatRequest) returns (EnterGroupChatResponse)
+  rpc LeftFromGroupChat(LeftFromGroupChatRequest) returns (LeftFromGroupChatResponse)
+}
+
+message Chat{
+  string uuid = 1;
+  string link = 2;
+  enum ChatType {
+    DIRECT = 0;
+    GROUP = 1;
+  }
+  ChatType chat_type = 3;
+  uint32 unread_message_count = 4;
+
+  message DirectFields{
+    bool is_online = 1;
+  }
+  message GroupFields{
+    uint32 members_count = 1;
+    uint32 members_online = 2;
+  }
+  oneof type_extension_oneof{
+    DirectFields direct_ext = 5;
+    GroupFields group_ext = 6;
+  }
+}
+
+message GetChatListRequest {}
+
+message GetChatListResponse{
+  repeated Chat chats = 1;
+  uint64 updated_at = 2;
+}
+
+message GetChatsUpdatesRequest{
+  uint64 start_at = 1;
+}
+
+message GetChatsUpdatesResponse{
+  repeated Updated updates = 2;
+  int64 updated_at = 4;
+
+  message CreatedMessage{
+    Message message = 1;
+  }
+
+  message UpdatedChatStatus {
+    string chat_uuid = 1;
+    oneof status_oneof{
+      Chat.DirectFields direct_ext = 2;
+      Chat.GroupFields group_ext = 3;
+    }
+  }
+
+  message Updated{
+    oneof updated_oneof{
+      CreatedMessage messages = 1;
+      UpdatedChatStatus status_updates = 2;
+    }
+  }
+
+}
+
+message Message{
+  string chat_uuid = 1;
+  uint64 created_at = 2;
+  oneof body_oneof{
+    UserMessage user_message = 3;
+    GroupSystemMessage group_system_message = 4;
+  }
+
+  message UserMessage{
+    string user_uuid = 1;
+    string text = 2;
+  }
+
+  message GroupSystemMessage{
+
+    message UserEntered {
+      string user_uuid = 1;
+    }
+
+    message UserLeft {
+      string user_uuid = 1;
+    }
+
+    message UserInvited {
+      string invited_uuid = 1;
+      string initiator_uuid = 2;
+    }
+
+    message ChatNameChanged{
+      string new_name = 1;
+      string initiator_uuid = 2;
+    }
+
+    oneof type_oneof{
+      UserEntered user_entered = 1;
+      UserLeft user_left = 2;
+      UserInvited user_invited = 3;
+      ChatNameChanged chat_name_changed = 4;
+    }
+  }
+}
+
+message GetPreviousMessagesRequest{
+  string chat_uuid = 1;
+  string last_message_uuid = 2;
+}
+
+message GetPreviousMessagesResponse{
+  repeated Message messages = 1;
+  bool the_end = 2;
+}
+
+
+message GetGroupMembersRequest{
+  string group_uuid = 1;
+}
+
+message GetGroupMembersResponse{
+  repeated Member members = 1;
+}
+
+message Member{
+  string uuid = 1;
+  string link = 2;
+  string name = 3;
+  enum MembershipStatus {
+    USER = 0;
+    CREATOR = 1;
+  }
+  bool is_online = 4;
+}
+
+message SendMessageRequest{
+  string text = 1;
+}
+
+message SendMessageResponse{}
+
+message CreateGroupChatRequest{
+  string link = 1;
+  string name = 2;
+  repeated string members_uuids = 3;
+}
+
+message CreateGroupChatResponse{
+ Chat chat = 1;
+}
+
+message InviteUsersRequest{
+  string user_uuid = 1;
+}
+
+message InviteUsersResponse{}
+
+message EnterGroupChatRequest{
+  string group_chat_uuid = 1;
+}
+
+message EnterGroupChatResponse{}
+
+message LeftFromGroupChatRequest{
+  string group_chat_uuid = 1;
+}
+
+message LeftFromGroupChatResponse{}
